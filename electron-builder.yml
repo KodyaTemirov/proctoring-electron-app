@@ -40,5 +40,7 @@ appImage:
   artifactName: ${name}-${version}.${ext}
 npmRebuild: false
 publish:
-  provider: generic
+  provider: github
   url: https://example.com/auto-updates
+  repo: https://github.com/KodyaTemirov/proctoring-electron-app
+  releaseType: draft

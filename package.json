@@ -21,7 +21,7 @@
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
     "active-win": "^8.2.1",
-    "electron-updater": "^6.1.7",
+    "electron-updater": "^6.1.8",
     "http": "^0.0.1-security",
     "socket.io": "^4.7.5"
   },

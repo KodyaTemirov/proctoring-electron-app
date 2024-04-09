@@ -1,7 +1,9 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
+
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/logo.png?asset'
+import { autoUpdater } from 'electron-updater'
 
 import http from 'http'
 import { setupSocketIOServer } from './websocketServer.js'
