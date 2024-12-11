@@ -39,51 +39,47 @@ export const getNumberOfMonitors = async () => {
 }
 
 export const getApps = async () => {
-  try {
-    const browsers = [
-      'google chrome',
-      'yandex with voice assistant alice',
-      'microsoft edge',
-      'firefox',
-      'safari'
-    ]
-    const activeApps = await activeWindow.getOpenWindowsSync({
-      accessibilityPermission: false,
-      screenRecordingPermission: false
-    })
+  const browsers = [
+    'google chrome',
+    'yandex with voice assistant alice',
+    'microsoft edge',
+    'firefox',
+    'safari'
+  ]
+  const activeApps = activeWindow.getOpenWindowsSync({
+    accessibilityPermission: false,
+    screenRecordingPermission: false
+  })
 
-    const activeBrowsers = []
-    const userDeniedApps = []
+  const activeBrowsers = []
+  const userDeniedApps = []
 
-    const deniedApps = [
-      'telegram desktop',
-      'telegram',
-      'teamviewer',
-      'anydesk',
-      'aeroadmin',
-      'getscreen',
-      'getscreen.me',
-      'supremo',
-      'supremo',
-      'tightvnc',
-      'radmin',
-      'kickidler'
-    ]
+  const deniedApps = [
+    'telegram desktop',
+    'telegram',
+    'teamviewer',
+    'anydesk',
+    'aeroadmin',
+    'getscreen',
+    'getscreen.me',
+    'supremo',
+    'supremo',
+    'tightvnc',
+    'radmin',
+    'kickidler'
+  ]
 
-    activeApps.forEach(({ owner: { name, title } }) => {
-      const ownerName = name.toLowerCase() || title.toLowerCase()
+  activeApps.forEach(({ owner: { name, title } }) => {
+    const ownerName = name.toLowerCase() || title.toLowerCase()
 
-      if (browsers.includes(ownerName)) {
-        activeBrowsers.push(name || title)
-      }
+    if (browsers.includes(ownerName)) {
+      activeBrowsers.push(name || title)
+    }
 
-      if (deniedApps.includes(ownerName)) {
-        userDeniedApps.push(name || title)
-      }
-    })
+    if (deniedApps.includes(ownerName)) {
+      userDeniedApps.push(name || title)
+    }
+  })
 
-    return { activeBrowsers, userDeniedApps }
-  } catch (error) {
-    throw error
-  }
+  return { activeBrowsers, userDeniedApps }
 }

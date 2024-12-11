@@ -12,6 +12,9 @@
       <a href="https://realsoft.uz/" target="_blank" rel="noreferrer">Realsoft.uz</a>
     </div>
     <div class="action">
+      <a target="_blank" href="http://realsoft.academy/">Realsoft.academy</a>
+    </div>
+    <div class="action">
       <a target="_blank" href="http://proctoring.uz/">Proctoring.uz</a>
     </div>
   </div>

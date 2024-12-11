@@ -39,9 +39,10 @@ export const setupSocketIOServer = (httpServer) => {
     await updateDataAndSend()
 
     // Обновляем данные и отправляем клиенту при изменениях
-    setInterval(updateDataAndSend, 2000)
+    const intervalId = setInterval(updateDataAndSend, 2000)
 
     socket.on('disconnect', () => {
+      clearInterval(intervalId)
       console.log('disconnect')
     })
   })
