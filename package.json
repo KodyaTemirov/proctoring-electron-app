@@ -1,7 +1,7 @@
 {
-  "name": "proctoring-app",
+  "name": "proctoring",
   "version": "2.0.0",
-  "description": "Proctoring App",
+  "description": "Proctoring",
   "main": "./out/main/index.js",
   "author": "example.com",
   "homepage": "https://electron-vite.org",
@@ -41,7 +41,7 @@
   },
   "build": {
     "appId": "com.kodyatemirov.proctoring",
-    "productName": "Proctoring App",
+    "productName": "Proctoring",
     "directories": {
       "output": "dist"
     },
