@@ -52,15 +52,15 @@
     ],
     "win": {
       "target": "nsis",
-      "icon": "resources/icon.ico"
+      "icon": "resources/logo.ico"
     },
     "mac": {
       "target": "dmg",
-      "icon": "resources/icon.icns"
+      "icon": "resources/logo.ico"
     },
     "linux": {
       "target": "AppImage",
-      "icon": "resources"
+      "icon": "resources/logo.ico"
     },
     "publish": [
       {

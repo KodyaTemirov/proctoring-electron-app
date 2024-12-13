@@ -18,7 +18,6 @@ function createWindow() {
     show: false,
     title: "Proctoring",
     autoHideMenuBar: true,
-    ...(process.platform === "linux" ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, "../preload/index.js"),
       sandbox: false,
@@ -39,8 +38,6 @@ function createWindow() {
   } else {
     mainWindow.loadFile(join(__dirname, "../renderer/index.html"));
   }
-
-  mainWindow.webContents.openDevTools();
 
   return mainWindow;
 }

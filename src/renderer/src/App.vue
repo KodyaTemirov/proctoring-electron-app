@@ -1,4 +1,8 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { reactive } from "vue";
+
+const versions = reactive({ ...window.electron.process.versions });
+</script>
 
 <template>
   <div class="creator">Powered by Realsoft</div>
