@@ -1,7 +1,7 @@
 {
   "name": "proctoring-app",
   "version": "1.0.0",
-  "description": "An Electron application with Vue",
+  "description": "Proctoring App",
   "main": "./out/main/index.js",
   "author": "example.com",
   "homepage": "https://electron-vite.org",
@@ -21,7 +21,7 @@
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
     "active-win": "^8.2.1",
-    "electron-updater": "^6.1.8",
+    "electron-updater": "^6.3.9",
     "http": "^0.0.1-security",
     "socket.io": "^4.7.5"
   },
@@ -31,12 +31,43 @@
     "@vitejs/plugin-vue": "^5.0.3",
     "@vue/eslint-config-prettier": "^9.0.0",
     "electron": "^28.2.0",
-    "electron-builder": "^24.9.1",
+    "electron-builder": "^25.1.8",
     "electron-vite": "^2.1.0",
     "eslint": "^8.56.0",
     "eslint-plugin-vue": "^9.20.1",
     "prettier": "^3.2.4",
     "vite": "^5.0.12",
     "vue": "^3.4.15"
+  },
+  "build": {
+    "appId": "com.kodyatemirov.proctoring",
+    "productName": "Proctoring App",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "out/**/*",
+      "node_modules/**/*",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis",
+      "icon": "resources/icon.ico"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "resources/icon.icns"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "resources"
+    },
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "kodyatemirov",
+        "repo": "proctoring-electron-app"
+      }
+    ]
   }
 }

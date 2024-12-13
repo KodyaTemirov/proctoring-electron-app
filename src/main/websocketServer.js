@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { getNumberOfMonitors, getApps } from './utils.js'
 import { Server } from 'socket.io'
 
@@ -43,7 +44,6 @@ export const setupSocketIOServer = (httpServer) => {
 
     socket.on('disconnect', () => {
       clearInterval(intervalId)
-      console.log('disconnect')
     })
   })
 }
