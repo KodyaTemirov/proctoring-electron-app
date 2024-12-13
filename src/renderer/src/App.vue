@@ -10,7 +10,7 @@
   <div class="actions">
     <div class="action">
       <a href="https://realsoft.uz/" target="_blank" rel="noreferrer"
-        >RealSoft</a
+        >RealSoft.uz</a
       >
     </div>
     <div class="action">

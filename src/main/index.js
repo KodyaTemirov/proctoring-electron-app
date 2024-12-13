@@ -9,6 +9,7 @@ import { autoUpdater } from "electron-updater";
 import http from "http";
 import { setupSocketIOServer } from "./websocketServer.js";
 import { getNumberOfMonitors, getApps } from "./utils";
+import fs from "fs";
 
 function createWindow() {
   const mainWindow = new BrowserWindow({
@@ -39,112 +40,131 @@ function createWindow() {
     mainWindow.loadFile(join(__dirname, "../renderer/index.html"));
   }
 
+  mainWindow.webContents.openDevTools();
+
   return mainWindow;
 }
 
-function setupAutoUpdater(mainWindow) {
-  autoUpdater.autoDownload = false;
+function setupAutoUpdaterAndCheck(mainWindow) {
+  return new Promise((resolve, reject) => {
+    autoUpdater.autoDownload = false;
 
-  autoUpdater.on("update-available", (info) => {
-    dialog
-      .showMessageBox(mainWindow, {
-        type: "info",
-        title: "Обновление доступно",
-        message: `Новая версия (${info.version}) доступна. Загрузить сейчас?`,
-        buttons: ["Да", "Позже"],
-      })
-      .then((result) => {
-        if (result.response === 0) {
+    autoUpdater.on("update-available", (info) => {
+      dialog
+        .showMessageBox(mainWindow, {
+          type: "info",
+          title: "Обновление доступно",
+          message: `Новая версия (${info.version}) доступна. Загрузка и установка начнется.`,
+        })
+        .then(() => {
           autoUpdater.downloadUpdate();
-        }
-      });
-  });
-
-  autoUpdater.on("update-downloaded", () => {
-    dialog
-      .showMessageBox(mainWindow, {
-        type: "info",
-        title: "Обновление готово",
-        message:
-          "Обновление было загружено. Приложение будет перезапущено для установки.",
-        buttons: ["Ок"],
-      })
-      .then(() => {
-        autoUpdater.quitAndInstall();
-      });
-  });
-
-  autoUpdater.on("update-not-available", () => {
-    dialog.showMessageBox(mainWindow, {
-      type: "info",
-      title: "Нет обновлений",
-      message: "Вы используете последнюю версию приложения.",
+        });
     });
-  });
 
-  autoUpdater.on("error", (error) => {
-    dialog.showMessageBox(mainWindow, {
-      type: "error",
-      title: "Ошибка обновления",
-      message: `Произошла ошибка: ${error.message}`,
+    autoUpdater.on("update-downloaded", () => {
+      dialog
+        .showMessageBox(mainWindow, {
+          type: "info",
+          title: "Обновление готово",
+          message:
+            "Обновление было загружено. Приложение будет перезапущено для установки.",
+        })
+        .then(() => {
+          autoUpdater.quitAndInstall();
+        });
     });
-  });
 
-  autoUpdater.checkForUpdates();
+    autoUpdater.on("update-not-available", () => {
+      resolve(); // Продолжить запуск приложения
+    });
+
+    autoUpdater.on("error", (error) => {
+      console.error("Ошибка обновления:", error);
+      fs.writeFileSync(
+        "error.log",
+        `
+        Дата: ${new Date().toISOString()}
+        Сообщение: ${error.message}
+        Стек: ${error.stack || "Нет данных"}
+        Имя ошибки: ${error.name || "Нет данных"}
+      `,
+        { flag: "a" },
+      );
+
+      dialog.showMessageBox(mainWindow, {
+        type: "error",
+        title: "Ошибка обновления",
+        message: `Произошла ошибка. Подробнее смотрите в файле error.log.`,
+      });
+
+      reject(new Error("Не удалось проверить обновления."));
+    });
+
+    autoUpdater.checkForUpdates();
+  });
 }
 
 app.whenReady().then(async () => {
   electronApp.setAppUserModelId("com.electron");
 
-  const server = http.createServer(async (req, res) => {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    res.setHeader("Content-Type", "application/json");
+  const mainWindow = new BrowserWindow({
+    show: false,
+  });
 
-    if (req.url === "/monitors") {
-      try {
-        const data = await getNumberOfMonitors();
-        res.end(JSON.stringify({ count: data }));
-      } catch (error) {
-        console.error(error);
-        res.statusCode = 500;
-        res.end("Internal Server Error");
-      }
-    } else if (req.url === "/apps") {
-      try {
-        const data = await getApps();
-        const stringifyObject = JSON.parse(data);
+  try {
+    await setupAutoUpdaterAndCheck(mainWindow);
 
-        if (stringifyObject.hasDeniedApps) {
-          res.end(stringifyObject.userDeniedApps);
-        } else {
-          res.end([]);
+    const server = http.createServer(async (req, res) => {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Content-Type", "application/json");
+
+      if (req.url === "/monitors") {
+        try {
+          const data = await getNumberOfMonitors();
+          res.end(JSON.stringify({ count: data }));
+        } catch (error) {
+          console.error(error);
+          res.statusCode = 500;
+          res.end("Internal Server Error");
         }
-      } catch (error) {
-        console.error(error);
+      } else if (req.url === "/apps") {
+        try {
+          const data = await getApps();
+          const stringifyObject = JSON.parse(data);
+
+          if (stringifyObject.hasDeniedApps) {
+            res.end(stringifyObject.userDeniedApps);
+          } else {
+            res.end([]);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      } else {
+        res.statusCode = 404;
+        res.end("Not Found");
       }
-    } else {
-      res.statusCode = 404;
-      res.end("Not Found");
-    }
-  });
+    });
 
-  await setupSocketIOServer(server);
+    await setupSocketIOServer(server);
 
-  server.listen(9061, () => {
-    console.log("Server is listening on port 9061");
-  });
+    server.listen(9061, () => {
+      console.log("Server is listening on port 9061");
+    });
 
-  app.on("browser-window-created", (_, window) => {
-    optimizer.watchWindowShortcuts(window);
-  });
+    app.on("browser-window-created", (_, window) => {
+      optimizer.watchWindowShortcuts(window);
+    });
 
-  const mainWindow = createWindow();
+    createWindow();
 
-  setupAutoUpdater(mainWindow);
-
-  app.on("activate", function () {
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
+    app.on("activate", function () {
+      if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    });
+  } catch (error) {
+    console.error("Ошибка при запуске приложения:", error);
+    app.quit();
+  }
 });
 
 app.on("window-all-closed", () => {
